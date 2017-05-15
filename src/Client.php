@@ -120,6 +120,14 @@ class Client
                     );
                     return $data;
                 default:
+                    if (defined('CURRENCYCLOUD_RESPONSE_ERROR_CALLBACK')) {
+                        try {
+                            call_user_func(CURRENCYCLOUD_RESPONSE_ERROR_CALLBACK, $response->getStatusCode(), $response->getBody()->getContents(), $options);
+                        } catch (\Exception $e) {
+                            log_exception($e);
+                        }
+                    }
+
                     //Everything that's not 200 consider error and dispatch event
                     $event = new ClientHttpErrorEvent(
                         $response,
